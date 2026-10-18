@@ -3,112 +3,138 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patient Seva | Live Hospital Queue</title>
-  <meta name="description" content="Patient Seva - Track your hospital token and waiting time.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patient Seva | Hospital Queue</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <header class="navbar">
-    <a class="brand" href="#">
-      <span class="logo">✚</span>
-      <span>Patient Seva<small>Smart Hospital Queue</small></span>
-    </a>
-    <button id="themeBtn" class="theme-btn">🌙 Theme</button>
+    <h2>✚ Patient Seva</h2>
+    <span>Smart Hospital Queue</span>
   </header>
 
   <main class="container">
-    <section class="welcome">
-      <span class="eyebrow">SMART HOSPITAL SERVICE</span>
-      <h1>Less Waiting, <span>Better Care.</span></h1>
-      <p>Apna token track karein aur apni baari ka status jaanein.</p>
+
+    <!-- 1. EMAIL LOGIN -->
+    <section id="loginPage" class="card">
+      <h1>Login by Email</h1>
+      <p>Enter your email to continue.</p>
+      <form id="emailForm">
+        <label>Email address</label>
+        <input id="email" type="email" required placeholder="you@example.com">
+        <button type="submit">Send OTP</button>
+      </form>
     </section>
 
-    <section class="card registration">
-      <h2>Register for Queue</h2>
-      <p>Apni details bharkar demo token generate karein.</p>
+    <!-- 2. OTP VERIFICATION -->
+    <section id="otpPage" class="card hidden">
+      <h1>Verify Email</h1>
+      <p>Enter your demo OTP.</p>
+      <p id="demoOtp" class="demo-otp"></p>
+      <form id="otpForm">
+        <label>6-digit OTP</label>
+        <input id="otp" inputmode="numeric" maxlength="6"
+          pattern="[0-9]{6}" required placeholder="Enter OTP">
+        <button type="submit">Verify & Continue</button>
+      </form>
+      <button id="resendOtp" class="secondary">Resend OTP</button>
+      <p id="otpMessage" class="message"></p>
+    </section>
+
+    <!-- 3. PATIENT REGISTRATION -->
+    <section id="registerPage" class="card hidden">
+      <h1>Register for Queue</h1>
+      <p>Enter patient details.</p>
 
       <form id="patientForm">
-        <label for="patientName">Patient Name</label>
-        <input id="patientName" type="text" placeholder="Enter full name" required>
+        <label>Patient name</label>
+        <input id="patientName" required placeholder="Full name">
 
-        <label for="patientAge">Age</label>
-        <input id="patientAge" type="number" min="1" max="120" placeholder="Enter age" required>
+        <label>Age</label>
+        <input id="age" type="number" min="1" max="120" required>
 
-        <label for="patientPhone">Mobile Number</label>
-        <input id="patientPhone" type="tel" inputmode="numeric"
-          pattern="[0-9]{10}" maxlength="10"
-          placeholder="10-digit mobile number" required>
+        <label>Mobile number</label>
+        <input id="phone" type="tel" inputmode="numeric"
+          pattern="[0-9]{10}" maxlength="10" required
+          placeholder="10-digit number">
 
-        <button type="submit" class="primary-btn">Get My Token</button>
+        <label>WhatsApp number</label>
+        <input id="whatsapp" type="tel" inputmode="numeric"
+          pattern="[0-9]{10}" maxlength="10" required
+          placeholder="10-digit WhatsApp number">
+
+        <label>Hospital name</label>
+        <input id="hospital" required placeholder="Enter hospital name">
+
+        <button type="submit">Continue to Payment</button>
       </form>
-      <p id="formMessage" class="message" aria-live="polite"></p>
+      <p id="registerMessage" class="message"></p>
     </section>
 
-    <section class="card tracker">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">LIVE QUEUE TRACKER</span>
-          <h2>Your Hospital Queue</h2>
-        </div>
-        <span class="live"><span></span> DEMO</span>
+    <!-- 4. PAYMENT -->
+    <section id="paymentPage" class="card hidden">
+      <h1>Registration Payment</h1>
+      <p>Pay the registration fee using your UPI app.</p>
+
+      <div class="amount">
+        <span>Registration Fee</span>
+        <strong>₹300</strong>
       </div>
+
+      <p><strong>Step 1:</strong> Open Google Pay, PhonePe or another UPI app.</p>
+      <p><strong>Step 2:</strong> Scan the hospital's official UPI QR code or pay using its verified UPI ID.</p>
+
+      <div class="warning">
+        Hospital UPI details must be added by the project owner before accepting payments.
+        Do not pay an unverified account.
+      </div>
+
+      <a id="upiLink" class="pay-button" href="#">Pay ₹300 using UPI</a>
+
+      <form id="paymentForm">
+        <label>UPI transaction / UTR number</label>
+        <input id="utr" required minlength="8" maxlength="30"
+          placeholder="Enter transaction reference">
+
+        <label>Upload payment screenshot</label>
+        <input id="paymentScreenshot" type="file"
+          accept="image/png,image/jpeg,image/webp" required>
+
+        <p class="small-note">Screenshot and UTR will be submitted for receptionist verification.</p>
+        <button type="submit">Submit for Verification</button>
+      </form>
+      <p id="paymentMessage" class="message"></p>
+    </section>
+
+    <!-- 5. PAYMENT PENDING -->
+    <section id="pendingPage" class="card hidden">
+      <h1>Payment Verification Pending</h1>
+      <p>Your payment details have been submitted in this demo.</p>
+      <div class="status">⏳ Awaiting Receptionist Verification</div>
+      <p>Your queue registration is not confirmed yet. A UTR or screenshot alone does not verify payment.</p>
+      <p id="pendingToken" class="token">Token not issued</p>
+    </section>
+
+    <!-- 6. QUEUE TRACKING -->
+    <section id="trackingPage" class="card hidden">
+      <h1>Track Your Queue</h1>
+      <p>Registration confirmed for demo purposes.</p>
+      <div id="myToken" class="token">A-026</div>
 
       <div class="stats">
-        <div class="stat">
-          <span>Your Token</span>
-          <strong id="yourToken">A-025</strong>
-        </div>
-        <div class="stat">
-          <span>Now Serving</span>
-          <strong id="nowServing">A-018</strong>
-        </div>
-        <div class="stat">
-          <span>Patients Ahead</span>
-          <strong id="patientsAhead">6</strong>
-        </div>
-        <div class="stat">
-          <span>Estimated Wait</span>
-          <strong id="waitTime">30 min</strong>
-        </div>
+        <div><span>Now Serving</span><strong id="serving">A-018</strong></div>
+        <div><span>Patients Ahead</span><strong id="ahead">7</strong></div>
+        <div><span>Estimated Wait</span><strong id="wait">35 min</strong></div>
       </div>
 
-      <h3>Queue Progress</h3>
-      <div class="queue-line">
-        <div class="queue-step done"><span>✓</span><small>Registered</small></div>
-        <div class="queue-step done"><span>✓</span><small>Waiting</small></div>
-        <div class="queue-step current"><span>●</span><small>Your Turn Soon</small></div>
-        <div class="queue-step"><span>4</span><small>Consultation</small></div>
-      </div>
-
-      <p class="note">Demo information only. Actual hospital queue updates are not connected yet.</p>
-      <button id="refreshBtn" class="secondary-btn">↻ Refresh Demo Queue</button>
+      <button id="refreshQueue">Refresh Demo Queue</button>
+      <p class="small-note">Demo only; live hospital data is not connected.</p>
     </section>
 
-    <section class="info-grid">
-      <article class="info-card">
-        <span class="info-icon">🕒</span>
-        <h3>Save Time</h3>
-        <p>Queue status dekhkar waiting ka andaaza lagayein.</p>
-      </article>
-      <article class="info-card">
-        <span class="info-icon">📱</span>
-        <h3>Easy Tracking</h3>
-        <p>Apna token number aasani se check karein.</p>
-      </article>
-      <article class="info-card">
-        <span class="info-icon">🏥</span>
-        <h3>Better Care</h3>
-        <p>Hospital visit ko aur convenient banayein.</p>
-      </article>
-    </section>
   </main>
 
-  <footer>
-    <p>© 2026 Patient Seva | Smart Hospital Live Queue Management</p>
-  </footer>
-
+  <footer>© 2026 Patient Seva | Less Waiting, Better Care</footer>
   <script src="script.js"></script>
 </body>
 </html>
+

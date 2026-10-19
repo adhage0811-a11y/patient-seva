@@ -1,4 +1,23 @@
 
+/* Patient Seva - Firebase connection */
+
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY",
+  authDomain: "PASTE_YOUR_AUTH_DOMAIN",
+  projectId: "patient-seva",
+  storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+  messagingSenderId: "905796150041",
+  appId: "PASTE_YOUR_APP_ID"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
+
+console.log("Patient Seva Firebase initialized");
+
 const patientForm = document.getElementById("patientForm");
 const formMessage = document.getElementById("formMessage");
 

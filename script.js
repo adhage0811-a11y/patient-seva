@@ -1,90 +1,275 @@
 
-/* Patient Seva - Firebase connection */
+
+   
+  
+/* =========================================
+   PATIENT SEVA - FIREBASE AUTHENTICATION
+   ========================================= */
+
+// STEP 1: Firebase configuration
+// Replace every placeholder with the exact value
+// from Firebase Console > Project settings > Your apps.
 
 const firebaseConfig = {
-  apiKey: "PASTE_YOUR_API_KEY",
-  authDomain: "PASTE_YOUR_AUTH_DOMAIN",
+  apiKey: "PASTE_YOUR_ACTUAL_API_KEY",
+  authDomain: "PASTE_YOUR_ACTUAL_AUTH_DOMAIN",
   projectId: "patient-seva",
-  storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+  storageBucket: "PASTE_YOUR_ACTUAL_STORAGE_BUCKET",
   messagingSenderId: "905796150041",
-  appId: "PASTE_YOUR_APP_ID"
+  appId: "PASTE_YOUR_ACTUAL_APP_ID"
 };
 
+// STEP 2: Initialize Firebase
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
 const auth = firebase.auth();
 
-console.log("Patient Seva Firebase initialized");
+// STEP 3: Find page elements safely
+const byId = (id) => document.getElementById(id);
 
-const patientForm = document.getElementById("patientForm");
-const formMessage = document.getElementById("formMessage");
+function showMessage(id, message, isError = false) {
+  const element = byId(id);
 
-let tokenCounter = 25;
-let servingCounter = 18;
-
-patientForm.addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  const name = document.getElementById("patientName").value.trim();
-  const age = Number(document.getElementById("patientAge").value);
-  const phone = document.getElementById("patientPhone").value.trim();
-
-  if (!name || age < 1 || age > 120 || !/^[0-9]{10}$/.test(phone)) {
-    formMessage.textContent = "Please enter valid patient details.";
-    formMessage.style.color = "#dc2626";
-    return;
-  }
-
-  tokenCounter++;
-
-  const token = "A-" + String(tokenCounter).padStart(3, "0");
-
-  document.getElementById("yourToken").textContent = token;
-
-  const ahead = Math.max(0, tokenCounter - servingCounter - 1);
-  document.getElementById("patientsAhead").textContent = ahead;
-  document.getElementById("waitTime").textContent = (ahead * 5) + " min";
-
-  formMessage.textContent =
-    "Thank you, " + name + "! Your demo token is " + token + ".";
-
-  formMessage.style.color = "#0e9f6e";
-
-  document.querySelector(".tracker").scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
-});
-
-document.getElementById("refreshBtn").addEventListener("click", function () {
-  if (servingCounter < tokenCounter) {
-    servingCounter++;
-  }
-
-  const ahead = Math.max(0, tokenCounter - servingCounter);
-  document.getElementById("nowServing").textContent =
-    "A-" + String(servingCounter).padStart(3, "0");
-  document.getElementById("patientsAhead").textContent = ahead;
-  document.getElementById("waitTime").textContent = (ahead * 5) + " min";
-
-  const steps = document.querySelectorAll(".queue-step");
-  steps.forEach(step => step.classList.remove("current"));
-
-  if (ahead === 0) {
-    steps[3].classList.add("current");
-  } else if (ahead <= 2) {
-    steps[2].classList.add("current");
+  if (element) {
+    element.textContent = message;
+    element.style.color = isError ? "#c62828" : "#187443";
   } else {
-    steps[1].classList.add("current");
+    alert(message);
   }
+}
+
+function showPage(pageId) {
+  document.querySelectorAll(
+    ".page, .card, section"
+  ).forEach((element) => {
+    if (
+      element.id &&
+      /loginPage|otpPage|registerPage|paymentPage|pendingPage|trackingPage|patientLogin|receptionistLogin|patientDashboard|receptionistDashboard/.test(element.id)
+    ) {
+      element.classList.add("hidden");
+    }
+  });
+
+  const page = byId(pageId);
+
+  if (page) {
+    page.classList.remove("hidden");
+    page.scrollIntoView({ behavior: "smooth", block: "start" });
+  } else {
+    showMessage(
+      "loginMessage",
+      "Login successful. Dashboard page abhi HTML mein add karna baaki hai."
+    );
+  }
+}
+
+// STEP 4: Login role selection
+// Your HTML needs buttons with these IDs:
+// patientLoginButton and receptionistLoginButton.
+
+let selectedRole = "patient";
+
+if (byId("patientLoginButton")) {
+  byId("patientLoginButton").addEventListener("click", () => {
+    selectedRole = "patient";
+    showPage("patientLogin");
+  });
+}
+
+if (byId("receptionistLoginButton")) {
+  byId("receptionistLoginButton").addEventListener("click", () => {
+    selectedRole = "receptionist";
+    showPage("receptionistLogin");
+  });
+}
+
+// STEP 5: Email/password registration
+// Expected IDs: signupForm, signupEmail, signupPassword,
+// signupMessage.
+
+if (byId("signupForm")) {
+  byId("signupForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email = byId("signupEmail")?.value.trim();
+    const password = byId("signupPassword")?.value;
+
+    if (!email || !password) {
+      showMessage("signupMessage", "Email aur password bharo.", true);
+      return;
+    }
+
+    try {
+      await auth.createUserWithEmailAndPassword(email, password);
+      showMessage("signupMessage", "Account create ho gaya!");
+    } catch (error) {
+      showMessage("signupMessage", error.message, true);
+    }
+  });
+}
+
+// STEP 6: Email/password login
+// Expected IDs: loginForm, loginEmail, loginPassword,
+// loginMessage.
+//
+// Receptionist access must NOT be granted just because
+// someone selects the receptionist role. A trusted backend
+// must verify staff authorization.
+
+if (byId("loginForm")) {
+  byId("loginForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const email = byId("loginEmail")?.value.trim();
+    const password = byId("loginPassword")?.value;
+
+    if (!email || !password) {
+      showMessage("loginMessage", "Email aur password bharo.", true);
+      return;
+    }
+
+    try {
+      const result = await auth.signInWithEmailAndPassword(
+        email,
+        password
+      );
+
+      if (selectedRole === "receptionist") {
+        // Fail closed: never show staff dashboard until
+        // trusted staff-role verification is implemented.
+        await auth.signOut();
+
+        showMessage(
+          "loginMessage",
+          "Receptionist login ke liye secure staff authorization abhi configure karna baaki hai.",
+          true
+        );
+        return;
+      }
+
+      showMessage(
+        "loginMessage",
+        "Patient account login successful: " + result.user.email
+      );
+
+      showPage("patientDashboard");
+    } catch (error) {
+      showMessage("loginMessage", error.message, true);
+    }
+  });
+}
+
+// STEP 7: Phone OTP setup
+// Expected HTML IDs:
+// phoneNumber, sendOtpButton, recaptcha-container,
+// otpCode, verifyOtpButton, phoneMessage.
+//
+// Firebase Console > Authentication > Sign-in method:
+// enable Phone. Configure authorized domains in settings.
+
+let confirmationResult = null;
+let recaptchaVerifier = null;
+
+async function setupRecaptcha() {
+  if (recaptchaVerifier) return;
+
+  if (!byId("recaptcha-container")) {
+    throw new Error("HTML mein recaptcha-container element missing hai.");
+  }
+
+  recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+    "recaptcha-container",
+    { size: "normal" }
+  );
+
+  await recaptchaVerifier.render();
+}
+
+if (byId("sendOtpButton")) {
+  byId("sendOtpButton").addEventListener("click", async () => {
+    const phone = byId("phoneNumber")?.value.trim();
+
+    if (!phone || !/^\+[1-9]\d{7,14}$/.test(phone)) {
+      showMessage(
+        "phoneMessage",
+        "Country code ke saath number likho, jaise +919876543210.",
+        true
+      );
+      return;
+    }
+
+    try {
+      await setupRecaptcha();
+
+      confirmationResult = await auth.signInWithPhoneNumber(
+        phone,
+        recaptchaVerifier
+      );
+
+      showMessage("phoneMessage", "OTP SMS bhej diya gaya hai.");
+    } catch (error) {
+      showMessage("phoneMessage", error.message, true);
+
+      if (recaptchaVerifier) {
+        recaptchaVerifier.clear();
+        recaptchaVerifier = null;
+      }
+    }
+  });
+}
+
+if (byId("verifyOtpButton")) {
+  byId("verifyOtpButton").addEventListener("click", async () => {
+    const code = byId("otpCode")?.value.trim();
+
+    if (!confirmationResult) {
+      showMessage("phoneMessage", "Pehle Send OTP dabao.", true);
+      return;
+    }
+
+    if (!/^\d{6}$/.test(code || "")) {
+      showMessage("phoneMessage", "6-digit OTP enter karo.", true);
+      return;
+    }
+
+    try {
+      await confirmationResult.confirm(code);
+      showMessage("phoneMessage", "Phone verification successful!");
+      showPage(
+        selectedRole === "receptionist"
+          ? "receptionistDashboard"
+          : "patientDashboard"
+      );
+    } catch (error) {
+      showMessage("phoneMessage", error.message, true);
+    }
+  });
+}
+
+// STEP 8: Logout
+// Add a button with ID logoutButton to your HTML.
+
+if (byId("logoutButton")) {
+  byId("logoutButton").addEventListener("click", async () => {
+    try {
+      await auth.signOut();
+      selectedRole = "patient";
+      showPage("loginPage");
+    } catch (error) {
+      alert("Logout error: " + error.message);
+    }
+  });
+}
+
+// STEP 9: Authentication state
+auth.onAuthStateChanged((user) => {
+  console.log(
+    user
+      ? "Firebase user signed in."
+      : "No Firebase user signed in."
+  );
 });
 
-document.getElementById("themeBtn").addEventListener("click", function () {
-  document.body.classList.toggle("dark");
-
-  this.textContent = document.body.classList.contains("dark")
-    ? "☀️ Light Mode"
-    : "🌙 Theme";
-});
+console.log("Patient Seva Firebase script loaded.");

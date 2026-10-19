@@ -1,144 +1,250 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Patient Seva | Hospital Queue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b6bcb">
+  <title>Patient Seva | Smart Hospital Queue</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="navbar">
-    <h2>✚ Patient Seva</h2>
-    <span>Smart Hospital Queue</span>
-  </header>
 
-  <main class="container">
+<header class="navbar">
+  <h2>✚ Patient Seva</h2>
+  <span>Smart Hospital Queue</span>
+</header>
 
-    <!-- 1. EMAIL LOGIN -->
-    <section id="loginPage" class="card">
-      <h1>Login by Email</h1>
-      <p>Enter your email to continue.</p>
-      <form id="emailForm">
-        <label>Email address</label>
-        <input id="email" type="email" required placeholder="you@example.com">
-        <button type="submit">Send OTP</button>
-      </form>
-    </section>
+<main class="container">
 
-    <!-- 2. OTP VERIFICATION -->
-    <section id="otpPage" class="card hidden">
-      <h1>Verify Email</h1>
-      <p>Enter your demo OTP.</p>
-      <p id="demoOtp" class="demo-otp"></p>
-      <form id="otpForm">
-        <label>6-digit OTP</label>
-        <input id="otp" inputmode="numeric" maxlength="6"
-          pattern="[0-9]{6}" required placeholder="Enter OTP">
-        <button type="submit">Verify & Continue</button>
-      </form>
-      <button id="resendOtp" class="secondary">Resend OTP</button>
-      <p id="otpMessage" class="message"></p>
-    </section>
+  <!-- HOME / ROLE SELECTION -->
+  <section id="loginPage" class="card">
+    <h1>Welcome to Patient Seva</h1>
+    <p>Smart Hospital Live Queue Management System</p>
+    <p>Select your login type.</p>
 
-    <!-- 3. PATIENT REGISTRATION -->
-    <section id="registerPage" class="card hidden">
-      <h1>Register for Queue</h1>
-      <p>Enter patient details.</p>
+    <button id="showPatientLogin" type="button">
+      Patient Login
+    </button>
 
-      <form id="patientForm">
-        <label>Patient name</label>
-        <input id="patientName" required placeholder="Full name">
+    <button id="showReceptionistLogin" class="secondary" type="button">
+      Receptionist Login
+    </button>
+  </section>
 
-        <label>Age</label>
-        <input id="age" type="number" min="1" max="120" required>
+  <!-- PATIENT LOGIN -->
+  <section id="patientLogin" class="card hidden">
+    <h1>Patient Login</h1>
+    <p>Sign in with your email and password.</p>
 
-        <label>Mobile number</label>
-        <input id="phone" type="tel" inputmode="numeric"
-          pattern="[0-9]{10}" maxlength="10" required
-          placeholder="10-digit number">
+    <form id="loginForm">
+      <label for="loginEmail">Email address</label>
+      <input id="loginEmail" type="email" required
+             placeholder="you@example.com">
 
-        <label>WhatsApp number</label>
-        <input id="whatsapp" type="tel" inputmode="numeric"
-          pattern="[0-9]{10}" maxlength="10" required
-          placeholder="10-digit WhatsApp number">
+      <label for="loginPassword">Password</label>
+      <input id="loginPassword" type="password" minlength="6"
+             required placeholder="Enter password">
 
-        <label>Hospital name</label>
-        <input id="hospital" required placeholder="Enter hospital name">
+      <button type="submit">Login</button>
+    </form>
 
-        <button type="submit">Continue to Payment</button>
-      </form>
-      <p id="registerMessage" class="message"></p>
-    </section>
+    <p id="loginMessage" class="message" aria-live="polite"></p>
 
-    <!-- 4. PAYMENT -->
-    <section id="paymentPage" class="card hidden">
-      <h1>Registration Payment</h1>
-      <p>Pay the registration fee using your UPI app.</p>
+    <hr>
 
-      <div class="amount">
-        <span>Registration Fee</span>
-        <strong>₹300</strong>
+    <h3>Create Patient Account</h3>
+    <form id="signupForm">
+      <label for="signupEmail">Email address</label>
+      <input id="signupEmail" type="email" required
+             placeholder="you@example.com">
+
+      <label for="signupPassword">Create password</label>
+      <input id="signupPassword" type="password" minlength="6"
+             required placeholder="At least 6 characters">
+
+      <button type="submit">Create Account</button>
+    </form>
+
+    <p id="signupMessage" class="message" aria-live="polite"></p>
+
+    <button type="button" class="secondary" id="backHome1">
+      Back
+    </button>
+  </section>
+
+  <!-- RECEPTIONIST LOGIN -->
+  <section id="receptionistLogin" class="card hidden">
+    <h1>Receptionist Login</h1>
+    <p>Authorized hospital staff only.</p>
+
+    <form id="staffLoginForm">
+      <label for="staffEmail">Staff email</label>
+      <input id="staffEmail" type="email" required
+             placeholder="Official staff email">
+
+      <label for="staffPassword">Password</label>
+      <input id="staffPassword" type="password" required
+             placeholder="Staff password">
+
+      <button type="submit">Staff Login</button>
+    </form>
+
+    <p id="staffMessage" class="message" aria-live="polite"></p>
+
+    <p class="small-note">
+      Staff access must be approved by a trusted backend.
+      Creating an ordinary patient account does not grant staff access.
+    </p>
+
+    <button type="button" class="secondary" id="backHome2">
+      Back
+    </button>
+  </section>
+
+  <!-- PATIENT DASHBOARD -->
+  <section id="patientDashboard" class="card hidden">
+    <h1>Patient Dashboard</h1>
+    <p id="patientWelcome">Welcome to Patient Seva.</p>
+
+    <button id="openRegistration" type="button">
+      Register for Queue
+    </button>
+
+    <button id="openTracking" type="button" class="secondary">
+      Track My Queue
+    </button>
+
+    <button id="patientLogout" type="button" class="danger">
+      Logout
+    </button>
+  </section>
+
+  <!-- QUEUE REGISTRATION -->
+  <section id="registerPage" class="card hidden">
+    <h1>Register for Queue</h1>
+    <p>Enter your details carefully.</p>
+
+    <form id="patientForm">
+      <label for="patientName">Patient name</label>
+      <input id="patientName" type="text" required
+             maxlength="100" placeholder="Full name">
+
+      <label for="patientAge">Age</label>
+      <input id="patientAge" type="number" min="1" max="120"
+             required placeholder="Age">
+
+      <label for="patientPhone">Mobile number</label>
+      <input id="patientPhone" type="tel" inputmode="numeric"
+             pattern="[0-9]{10}" maxlength="10" required
+             placeholder="10-digit mobile number">
+
+      <label for="patientWhatsapp">WhatsApp number</label>
+      <input id="patientWhatsapp" type="tel" inputmode="numeric"
+             pattern="[0-9]{10}" maxlength="10" required
+             placeholder="10-digit WhatsApp number">
+
+      <label for="hospitalName">Hospital name</label>
+      <input id="hospitalName" type="text" required
+             placeholder="Enter hospital name">
+
+      <button type="submit">Continue</button>
+    </form>
+
+    <p id="registrationMessage" class="message" aria-live="polite"></p>
+
+    <button type="button" class="secondary" id="backDashboard1">
+      Back to Dashboard
+    </button>
+  </section>
+
+  <!-- PAYMENT INFORMATION -->
+  <section id="paymentPage" class="card hidden">
+    <h1>Registration Payment</h1>
+
+    <div class="amount">
+      <span>Registration fee</span>
+      <strong>₹300</strong>
+    </div>
+
+    <p>
+      Pay only after the hospital's official payment details
+      have been verified.
+    </p>
+
+    <div class="warning">
+      <strong>Payment setup pending</strong>
+      <p>
+        The hospital's verified UPI ID and payment verification
+        backend have not been configured yet. Do not send money
+        using an unverified account.
+      </p>
+    </div>
+
+    <p id="paymentPatientDetails"></p>
+
+    <button type="button" class="secondary" id="backRegistration">
+      Back
+    </button>
+  </section>
+
+  <!-- TRACK QUEUE -->
+  <section id="trackingPage" class="card hidden">
+    <h1>Track Your Queue</h1>
+
+    <div class="warning">
+      Live queue tracking is not connected yet. No real token or
+      waiting time is available until the backend is configured.
+    </div>
+
+    <div class="stats">
+      <div>
+        <span>Your token</span>
+        <strong id="myToken">Not issued</strong>
       </div>
-
-      <p><strong>Step 1:</strong> Open Google Pay, PhonePe or another UPI app.</p>
-      <p><strong>Step 2:</strong> Scan the hospital's official UPI QR code or pay using its verified UPI ID.</p>
-
-      <div class="warning">
-        Hospital UPI details must be added by the project owner before accepting payments.
-        Do not pay an unverified account.
+      <div>
+        <span>Now serving</span>
+        <strong id="serving">Not available</strong>
       </div>
-
-      <a id="upiLink" class="pay-button" href="#">Pay ₹300 using UPI</a>
-
-      <form id="paymentForm">
-        <label>UPI transaction / UTR number</label>
-        <input id="utr" required minlength="8" maxlength="30"
-          placeholder="Enter transaction reference">
-
-        <label>Upload payment screenshot</label>
-        <input id="paymentScreenshot" type="file"
-          accept="image/png,image/jpeg,image/webp" required>
-
-        <p class="small-note">Screenshot and UTR will be submitted for receptionist verification.</p>
-        <button type="submit">Submit for Verification</button>
-      </form>
-      <p id="paymentMessage" class="message"></p>
-    </section>
-
-    <!-- 5. PAYMENT PENDING -->
-    <section id="pendingPage" class="card hidden">
-      <h1>Payment Verification Pending</h1>
-      <p>Your payment details have been submitted in this demo.</p>
-      <div class="status">⏳ Awaiting Receptionist Verification</div>
-      <p>Your queue registration is not confirmed yet. A UTR or screenshot alone does not verify payment.</p>
-      <p id="pendingToken" class="token">Token not issued</p>
-    </section>
-
-    <!-- 6. QUEUE TRACKING -->
-    <section id="trackingPage" class="card hidden">
-      <h1>Track Your Queue</h1>
-      <p>Registration confirmed for demo purposes.</p>
-      <div id="myToken" class="token">A-026</div>
-
-      <div class="stats">
-        <div><span>Now Serving</span><strong id="serving">A-018</strong></div>
-        <div><span>Patients Ahead</span><strong id="ahead">7</strong></div>
-        <div><span>Estimated Wait</span><strong id="wait">35 min</strong></div>
+      <div>
+        <span>Patients ahead</span>
+        <strong id="ahead">—</strong>
       </div>
+      <div>
+        <span>Estimated wait</span>
+        <strong id="wait">—</strong>
+      </div>
+    </div>
 
-      <button id="refreshQueue">Refresh Demo Queue</button>
-      <p class="small-note">Demo only; live hospital data is not connected.</p>
-    </section>
+    <p id="trackingMessage" class="message" aria-live="polite"></p>
 
-  </main>
+    <button type="button" class="secondary" id="backDashboard2">
+      Back to Dashboard
+    </button>
+  </section>
 
-  <footer>© 2026 Patient Seva | Less Waiting, Better Care</footer>
-  
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="script.js"></script>
+  <!-- RECEPTIONIST DASHBOARD -->
+  <section id="receptionistDashboard" class="card hidden">
+    <h1>Receptionist Dashboard</h1>
+
+    <div class="warning">
+      Staff authorization and live queue operations are not
+      connected yet. This dashboard must not be used to manage
+      real patient records until secure staff access is implemented.
+    </div>
+
+    <button id="staffLogout" type="button" class="danger">
+      Logout
+    </button>
+  </section>
+
+</main>
+
+<footer>
+  © 2026 Patient Seva | Less Waiting, Better Care
+</footer>
+
+<script type="module" src="script.js"></script>
 </body>
 </html>
-
-
